@@ -1,1 +1,18 @@
+# Dependencies
+node_modules/
+
+# Environment variables — NEVER upload these
 .env
+.env.local
+.env.production
+
+# Vite build output
+dist/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Editor folders
+.vscode/
+.idea/
