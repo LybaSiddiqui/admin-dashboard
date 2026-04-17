@@ -15,4 +15,4 @@ Thumbs.db
 
 # Editor folders
 .vscode/
-.idea/
+.idea/node_modules
