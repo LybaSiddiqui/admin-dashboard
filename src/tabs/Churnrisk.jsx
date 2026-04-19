@@ -4,6 +4,8 @@ import { Card, Stack, KpiCard, Loader } from '../components/UI.jsx'
 import { runSQL } from '../supabaseClient.js'
 import { churnProbability } from '../ml/algorithms.js'
 
+// Churn Risk Tab — combines RFM metrics into a logistic-inspired churn probability score, with custom table and filters
+
 const rLabel = p => p >= 75 ? 'Critical' : p >= 50 ? 'High' : p >= 25 ? 'Medium' : 'Low'
 const rColor = p => p >= 75 ? C.red : p >= 50 ? C.amber : p >= 25 ? C.accent : C.green
 
