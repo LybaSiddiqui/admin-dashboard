@@ -5,6 +5,7 @@ import App from './App.jsx'
 const css = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  /* ── dark theme (default) ─────────────────── */
   :root {
     --bg:        #0a0d14;
     --surface:   #10141f;
@@ -24,6 +25,32 @@ const css = `
     --purple:    #a78bfa;
     --cyan:      #22d3ee;
     --pink:      #f472b6;
+  }
+
+  /* ── light theme ──────────────────────────── */
+  :root.light {
+    --bg:        #f0f2f7;
+    --surface:   #ffffff;
+    --surface2:  #f5f7fc;
+    --surface3:  #eaecf4;
+    --border:    rgba(0,0,0,0.08);
+    --border-md: rgba(0,0,0,0.14);
+    --text:      #0f1729;
+    --text-sub:  #5a6a85;
+    --text-muted:#b0bcd4;
+    --accent:    #2563eb;
+    --accent-lt: #3b82f6;
+    --green:     #16a34a;
+    --green-lt:  #22c55e;
+    --amber:     #d97706;
+    --red:       #dc2626;
+    --purple:    #7c3aed;
+    --cyan:      #0891b2;
+    --pink:      #db2777;
+  }
+
+  /* ── shared ───────────────────────────────── */
+  :root, :root.light {
     --sidebar-w: 240px;
     --topbar-h:  56px;
     --radius-sm: 6px;
@@ -32,8 +59,8 @@ const css = `
     --font:      'DM Sans', system-ui, sans-serif;
     --font-mono: 'DM Mono', 'Fira Code', monospace;
     --font-head: 'Syne', sans-serif;
-    --shadow:    0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3);
-    --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+    --shadow:    0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
     --transition: 0.15s ease;
   }
 
@@ -47,6 +74,7 @@ const css = `
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background 0.2s ease, color 0.2s ease;
   }
   #root { height: 100%; display: flex; }
 

@@ -47,27 +47,74 @@ const PAGE_META = {
   data: { title: 'Data Management', sub: 'Add and manage database records' },
 }
 
-const COMPONENTS = { overview: Overview, product: ProductExplorer, customer: CustomerExplorer, churn: ChurnRisk, ml: MLInsights, data: DataManagement }
+const COMPONENTS = {
+  overview: Overview, product: ProductExplorer, customer: CustomerExplorer,
+  churn: ChurnRisk, ml: MLInsights, data: DataManagement,
+}
 
-function NavItem({ item, active, onClick }) {
-  const isActive = active === item.id
+// ── theme toggle button ────────────────────────────────────────
+function ThemeToggle({ dark, onToggle }) {
   return (
-    <button onClick={() => onClick(item.id)}
-      style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: isActive ? 'rgba(79,127,255,0.12)' : 'transparent', color: isActive ? '#7da0ff' : C.textSub, fontSize: 13, fontWeight: isActive ? 500 : 400, cursor: 'pointer', border: `1px solid ${isActive ? 'rgba(79,127,255,0.2)' : 'transparent'}`, transition: 'all 0.12s', textAlign: 'left' }}
-      onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.color = C.text } }}
-      onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = C.textSub } }}>
-      <span style={{ display: 'flex', alignItems: 'center', opacity: isActive ? 1 : 0.6, flexShrink: 0 }}>{item.icon}</span>
-      <span style={{ flex: 1 }}>{item.label}</span>
-      {item.badge && (
-        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#f59e0b', flexShrink: 0 }} />
+    <button onClick={onToggle}
+      title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+      style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '9px 12px', borderRadius: 'var(--radius-sm)', background: 'var(--surface2)', border: '1px solid var(--border)', color: C.textSub, fontSize: 12, fontWeight: 500, cursor: 'pointer', transition: 'all 0.15s' }}
+      onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface3)'; e.currentTarget.style.color = C.text }}
+      onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface2)'; e.currentTarget.style.color = C.textSub }}>
+      {dark ? (
+        <>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="5" />
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+          </svg>
+          Light mode
+        </>
+      ) : (
+        <>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+          Dark mode
+        </>
       )}
+      {/* toggle pill */}
+      <div style={{ marginLeft: 'auto', width: 32, height: 18, borderRadius: 99, background: dark ? 'var(--accent)' : 'var(--surface3)', border: '1px solid var(--border)', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+        <div style={{ position: 'absolute', top: 2, left: dark ? 'calc(100% - 16px)' : 2, width: 12, height: 12, borderRadius: '50%', background: dark ? '#fff' : 'var(--text-sub)', transition: 'left 0.2s ease, background 0.2s' }} />
+      </div>
     </button>
   )
 }
 
+// ── nav item ──────────────────────────────────────────────────
+function NavItem({ item, active, onClick }) {
+  const isActive = active === item.id
+  return (
+    <button onClick={() => onClick(item.id)}
+      style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: isActive ? 'rgba(79,127,255,0.12)' : 'transparent', color: isActive ? 'var(--accent-lt)' : C.textSub, fontSize: 13, fontWeight: isActive ? 500 : 400, cursor: 'pointer', border: `1px solid ${isActive ? 'rgba(79,127,255,0.2)' : 'transparent'}`, transition: 'all 0.12s', textAlign: 'left' }}
+      onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'var(--surface3)'; e.currentTarget.style.color = 'var(--text)' } }}
+      onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = C.textSub } }}>
+      <span style={{ display: 'flex', alignItems: 'center', opacity: isActive ? 1 : 0.6, flexShrink: 0 }}>{item.icon}</span>
+      <span style={{ flex: 1 }}>{item.label}</span>
+      {item.badge && <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--amber)', flexShrink: 0 }} />}
+    </button>
+  )
+}
+
+// ── app ───────────────────────────────────────────────────────
 export default function App() {
   const [tab, setTab] = useState('overview')
   const [connected, setConnected] = useState(null)
+  const [dark, setDark] = useState(() => {
+    // read preference from localStorage, default to dark
+    try { return localStorage.getItem('dbmt-theme') !== 'light' }
+    catch { return true }
+  })
+
+  // apply theme class to <html> element
+  useEffect(() => {
+    document.documentElement.classList.toggle('light', !dark)
+    try { localStorage.setItem('dbmt-theme', dark ? 'dark' : 'light') }
+    catch { }
+  }, [dark])
 
   useEffect(() => {
     supabase.from('customers').select('customerid', { count: 'exact', head: true }).limit(1)
@@ -81,14 +128,18 @@ export default function App() {
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100%', overflow: 'hidden' }}>
 
-      {/* sidebar */}
+      {/* ── sidebar ──────────────────────────────────── */}
       <aside style={{ width: 'var(--sidebar-w)', flexShrink: 0, background: 'var(--surface)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
 
         {/* logo */}
         <div style={{ padding: '16px 16px 14px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 30, height: 30, background: 'linear-gradient(135deg, #4f7fff, #7da0ff)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3" stroke="white" strokeWidth="1.5" /><path d="M3 5v6c0 1.657 4.03 3 9 3s9-1.343 9-3V5" stroke="white" strokeWidth="1.5" /><path d="M3 11v6c0 1.657 4.03 3 9 3s9-1.343 9-3v-6" stroke="white" strokeWidth="1.5" /></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <ellipse cx="12" cy="5" rx="9" ry="3" stroke="white" strokeWidth="1.5" />
+                <path d="M3 5v6c0 1.657 4.03 3 9 3s9-1.343 9-3V5" stroke="white" strokeWidth="1.5" />
+                <path d="M3 11v6c0 1.657 4.03 3 9 3s9-1.343 9-3v-6" stroke="white" strokeWidth="1.5" />
+              </svg>
             </div>
             <div>
               <p style={{ fontSize: 13, fontWeight: 700, color: C.text, lineHeight: 1, fontFamily: 'var(--font-head)' }}>DBMT Admin</p>
@@ -105,21 +156,23 @@ export default function App() {
           {NAV.slice(3).map(item => <NavItem key={item.id} item={item} active={tab} onClick={setTab} />)}
         </nav>
 
-        {/* connection status */}
-        <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border)', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 'var(--radius-sm)', background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-            <div style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: connected === true ? C.green : connected === false ? C.red : C.textMut, boxShadow: connected === true ? `0 0 6px ${C.green}80` : 'none' }} />
-            <span style={{ fontSize: 11, color: connected === true ? C.green : connected === false ? C.red : C.textSub, fontWeight: 500 }}>
-              {connected === null ? 'Connecting…' : connected ? 'Supabase connected' : 'Connection failed'}
-            </span>
+        {/* bottom: theme toggle + status */}
+        <div style={{ padding: '12px 8px', borderTop: '1px solid var(--border)', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <ThemeToggle dark={dark} onToggle={() => setDark(d => !d)} />
+
+          <div style={{ padding: '0 4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 'var(--radius-sm)', background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+              <div style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: connected === true ? C.green : connected === false ? C.red : C.textMut, boxShadow: connected === true ? `0 0 6px ${C.green}80` : 'none' }} />
+              <span style={{ fontSize: 11, color: connected === true ? C.green : connected === false ? C.red : C.textSub, fontWeight: 500 }}>
+                {connected === null ? 'Connecting…' : connected ? 'Supabase connected' : 'Connection failed'}
+              </span>
+            </div>
+            <p style={{ fontSize: 10, color: C.textMut, marginTop: 8, textAlign: 'center', lineHeight: 1.5 }}>Team 7 · DBMT Project</p>
           </div>
-          <p style={{ fontSize: 10, color: C.textMut, marginTop: 10, textAlign: 'center', lineHeight: 1.5 }}>
-            Team 7 · DBMT Project
-          </p>
         </div>
       </aside>
 
-      {/* main */}
+      {/* ── main ─────────────────────────────────────── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
         {/* topbar */}
