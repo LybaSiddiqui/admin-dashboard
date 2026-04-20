@@ -167,7 +167,7 @@ export default function App() {
                 {connected === null ? 'Connecting…' : connected ? 'Supabase connected' : 'Connection failed'}
               </span>
             </div>
-            <p style={{ fontSize: 10, color: C.textMut, marginTop: 8, textAlign: 'center', lineHeight: 1.5 }}>Team 7 · DBMT Project</p>
+            <p style={{ fontSize: 10, color: C.textMut, marginTop: 8, textAlign: 'center', lineHeight: 1.5 }}>Lyba Siddiqui/p>
           </div>
         </div>
       </aside>
